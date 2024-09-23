@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GalleryDomain.Model;
 using GalleryInfrastructure;
+using System.Diagnostics.Metrics;
 
 namespace GalleryInfrastructure.Controllers
 {
@@ -63,9 +64,15 @@ namespace GalleryInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(photo);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
+                {
+                    _context.Add(photo);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Image", "Це зображення з такою назвою у цього автора вже існує");
+
             }
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", photo.AuthorId);
             ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", photo.LocationId);
@@ -104,23 +111,28 @@ namespace GalleryInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
                 {
-                    _context.Update(photo);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PhotoExists(photo.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(photo);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!PhotoExists(photo.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Image", "Це зображення з такою назвою у цього автора вже існує");
             }
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", photo.AuthorId);
             ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", photo.LocationId);
@@ -165,6 +177,16 @@ namespace GalleryInfrastructure.Controllers
         private bool PhotoExists(int id)
         {
             return _context.Photos.Any(e => e.Id == id);
+        }
+        private async Task<bool> IsPhotoExists(string title, byte[] image, int authorId, int id)
+        {
+            var photo = await _context.Photos
+                .FirstOrDefaultAsync(m => m.Title == title
+                                       && m.Image == image
+                                       && m.AuthorId == authorId
+                                       && m.Id != id);
+
+            return photo != null;
         }
     }
 }

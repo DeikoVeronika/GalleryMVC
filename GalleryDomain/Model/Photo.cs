@@ -6,7 +6,7 @@ namespace GalleryDomain.Model;
 
 public partial class Photo : Entity
 {
-    public int? AuthorId { get; set; }
+    public int AuthorId { get; set; }
 
     [Required(ErrorMessage = "Придумайте назву для фото")]
     [Display(Name = "Назва фото")]

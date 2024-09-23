@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GalleryDomain.Model;
 using GalleryInfrastructure;
+using System.Diagnostics.Metrics;
 
 namespace GalleryInfrastructure.Controllers
 {
@@ -58,9 +59,15 @@ namespace GalleryInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(location);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsLocationExists(location.Name, location.Id))
+                {
+                    _context.Add(location);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Name", "Локацію з такою назвою вже створено.");
+
             }
             return View(location);
         }
@@ -95,23 +102,29 @@ namespace GalleryInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsLocationExists(location.Name, location.Id))
                 {
-                    _context.Update(location);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LocationExists(location.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(location);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!LocationExists(location.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Name", "Локацію з такою назвою вже створено.");
+
             }
             return View(location);
         }
@@ -152,6 +165,14 @@ namespace GalleryInfrastructure.Controllers
         private bool LocationExists(int id)
         {
             return _context.Locations.Any(e => e.Id == id);
+        }
+        private async Task<bool> IsLocationExists(string name, int id)
+        {
+            var location = await _context.Locations
+                .FirstOrDefaultAsync(m => m.Name == name
+                                       && m.Id != id);
+
+            return location != null;
         }
     }
 }

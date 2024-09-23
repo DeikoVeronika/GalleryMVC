@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GalleryDomain.Model;
 using GalleryInfrastructure;
+using Humanizer.Localisation;
 
 namespace GalleryInfrastructure.Controllers
 {
@@ -58,9 +59,15 @@ namespace GalleryInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(country);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsCountryExists(country.Name, country.Id))
+                {
+                    _context.Add(country);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Name", "Країну з такою назвою вже створено.");
+
             }
             return View(country);
         }
@@ -95,23 +102,29 @@ namespace GalleryInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsCountryExists(country.Name, country.Id))
                 {
-                    _context.Update(country);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CountryExists(country.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(country);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!CountryExists(country.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Name", "Країну з такою назвою вже створено.");
+
             }
             return View(country);
         }
@@ -152,6 +165,14 @@ namespace GalleryInfrastructure.Controllers
         private bool CountryExists(int id)
         {
             return _context.Countries.Any(e => e.Id == id);
+        }
+        private async Task<bool> IsCountryExists(string name, int id)
+        {
+            var country = await _context.Countries
+                .FirstOrDefaultAsync(m => m.Name == name
+                                       && m.Id != id);
+
+            return country != null;
         }
     }
 }

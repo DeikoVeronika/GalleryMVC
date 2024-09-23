@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GalleryDomain.Model;
 using GalleryInfrastructure;
+using Humanizer.Localisation;
 
 namespace GalleryInfrastructure.Controllers
 {
@@ -61,9 +62,14 @@ namespace GalleryInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(author);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (!await IsAuthorExists(author.Name, author.Biography, author.Id))
+                {
+                    _context.Add(author);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                    ModelState.AddModelError("Biography", "Автор з таким іменем і біографією вже існує.");
             }
             ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Name", author.CountryId);
             return View(author);
@@ -100,23 +106,29 @@ namespace GalleryInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (!await IsAuthorExists(author.Name, author.Biography, author.Id))
                 {
-                    _context.Update(author);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AuthorExists(author.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(author);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!AuthorExists(author.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                    ModelState.AddModelError("Biography", "Автор з таким іменем і біографією вже існує.");
+
             }
             ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Name", author.CountryId);
             return View(author);
@@ -159,6 +171,15 @@ namespace GalleryInfrastructure.Controllers
         private bool AuthorExists(int id)
         {
             return _context.Authors.Any(e => e.Id == id);
+        }
+        private async Task<bool> IsAuthorExists(string name, string? biography, int id)
+        {
+            var author = await _context.Authors
+                .FirstOrDefaultAsync(m => m.Name == name
+                                       && m.Biography == biography
+                                       && m.Id != id);
+
+            return author != null;
         }
     }
 }
