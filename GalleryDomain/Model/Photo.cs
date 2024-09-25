@@ -13,6 +13,7 @@ public partial class Photo : Entity
     public string Title { get; set; } = null!;
    
     [Display(Name = "Дата фото")]
+
     public DateOnly? Date { get; set; }
 
     [Display(Name = "Опис фото")]

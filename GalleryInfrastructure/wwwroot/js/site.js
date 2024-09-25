@@ -1,4 +1,11 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿// Очищення повідомлень про помилки при введенні даних
+const inputs = document.querySelectorAll('.form-control');
+inputs.forEach(input => {
+    input.addEventListener('input', function () {
+        const errorSpan = this.nextElementSibling;
+        if (errorSpan) {
+            errorSpan.textContent = '';
+        }
+    });
+});
 
-// Write your JavaScript code.

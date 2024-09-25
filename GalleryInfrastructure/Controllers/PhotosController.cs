@@ -191,14 +191,16 @@ namespace GalleryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var photo = await _context.Photos.FindAsync(id);
-            if (photo != null)
-            {
-                _context.Photos.Remove(photo);
-            }
+            if (photo == null)
+                return Json(new { success = false, message = "Фото не знайдено." });
 
+
+            _context.Photos.Remove(photo);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Json(new { success = true, message = "Фото успішно видалено." });
         }
+
         private async Task<byte[]> ConvertImageToByteArrayAsync(IFormFile imageFile)
         {
             using (var ms = new MemoryStream())

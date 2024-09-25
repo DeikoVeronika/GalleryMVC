@@ -154,15 +154,20 @@ namespace GalleryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var country = await _context.Countries.FindAsync(id);
-            if (country != null)
-            {
-                _context.Countries.Remove(country);
-            }
+            if (country == null)
+                return NotFound();
 
+            if (await IsCountryLinkedToAuthor(id))
+                return Json(new { success = false, message = "Неможливо видалити країну, оскільки до неї прив'язані автори фотографій. Спочатку видаліть їх." });
+
+            _context.Countries.Remove(country);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "Країну успішно видалено." });
         }
-
+        private async Task<bool> IsCountryLinkedToAuthor(int countryId)
+        {
+            return await _context.Authors.AnyAsync(a => a.CountryId == countryId);
+        }
         private bool CountryExists(int id)
         {
             return _context.Countries.Any(e => e.Id == id);

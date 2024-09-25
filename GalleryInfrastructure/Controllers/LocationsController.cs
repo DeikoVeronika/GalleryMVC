@@ -153,13 +153,21 @@ namespace GalleryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var location = await _context.Locations.FindAsync(id);
-            if (location != null)
-            {
-                _context.Locations.Remove(location);
-            }
+            if (location == null)
+                return NotFound();
 
+            if (await IsLocationLinkedToPhotos(id))
+                return Json(new { success = false, message = "Неможливо видалити локацію, оскільки до неї прив'язані фото." });
+
+
+            _context.Locations.Remove(location);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Json(new { success = true, message = "Локацію успішно видалено." });
+        }
+
+        private async Task<bool> IsLocationLinkedToPhotos(int locationId)
+        {
+            return await _context.Photos.AnyAsync(p => p.LocationId == locationId);
         }
 
         private bool LocationExists(int id)

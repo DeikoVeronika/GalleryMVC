@@ -167,18 +167,34 @@ namespace GalleryInfrastructure.Controllers
         // POST: Authors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, bool confirmDeletePhotos = false)
         {
             var author = await _context.Authors.FindAsync(id);
-            if (author != null)
+            if (author == null)
+                return NotFound();
+
+            // Перевірка, чи є у автора прив'язані фото
+            if (await IsAuthorLinkedToPhotos(id))
             {
-                _context.Authors.Remove(author);
+                // Якщо фото є, але немає підтвердження на видалення
+                if (!confirmDeletePhotos)
+                {
+                    return Json(new { success = false, message = "До автора прив'язані фото. Підтвердіть видалення автора разом з фотографіями.", confirmRequired = true });
+                }
+
+                // Якщо підтвердження отримано, видаляємо фото разом з автором
+                _context.Photos.RemoveRange(_context.Photos.Where(p => p.AuthorId == id));
             }
 
+            _context.Authors.Remove(author);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
+            return Json(new { success = true, message = "Автор та його фотографії успішно видалені." });
+        }
+        private async Task<bool> IsAuthorLinkedToPhotos(int authorId)
+        {
+            return await _context.Photos.AnyAsync(a => a.AuthorId == authorId);
+        }
         private bool AuthorExists(int id)
         {
             return _context.Authors.Any(e => e.Id == id);
