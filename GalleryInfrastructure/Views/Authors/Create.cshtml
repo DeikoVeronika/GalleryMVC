@@ -1,12 +1,12 @@
 ﻿@model GalleryDomain.Model.Author
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Додавання";
 }
 
 <h1>Create</h1>
 
-<h4>Author</h4>
+<h4>Додавання фотографа</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,7 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" placeholder="Введіть ім'я та прізвище автора" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -23,18 +23,19 @@
             </div>
             <div class="form-group">
                 <label asp-for="Biography" class="control-label"></label>
-                <input asp-for="Biography" class="form-control" />
+                <textarea id="biography" asp-for="Biography" class="form-control" placeholder="Розкажіть про себе..."></textarea>
                 <span asp-validation-for="Biography" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Додати" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Всі фотографи</a>
+    не знайшли потрібну країну? Додайте її до бази прямо зараз!
 </div>
 
 @section Scripts {

@@ -1,13 +1,12 @@
 ﻿@model GalleryDomain.Model.Author
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Інформація";
 }
 
-<h1>Details</h1>
 
 <div>
-    <h4>Author</h4>
+    <h4>Інформація про фотографа</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -31,6 +30,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати інформацію</a> |
+    <a asp-action="Index">Всі фотографи</a>
 </div>

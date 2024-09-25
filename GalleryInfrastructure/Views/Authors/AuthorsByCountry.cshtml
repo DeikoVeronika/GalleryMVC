@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<GalleryDomain.Model.Author>
 
 @{
-    ViewData["Title"] = "AuthorsByCountry";
+    ViewData["Title"] = "Фотографи країни";
 }
 
-<h1>Index</h1>
+<h1>Автори країни</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Додати фотографа</a>
 </p>
 <div class="list-group">
     @foreach (var item in Model)

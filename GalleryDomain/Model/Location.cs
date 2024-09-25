@@ -6,7 +6,7 @@ namespace GalleryDomain.Model;
 
 public partial class Location : Entity
 {
-    [Required(ErrorMessage = "Введіть локацію")]
+    [Required(ErrorMessage = "Введіть назву локації")]
     [Display(Name = "Локація")]
     public string Name { get; set; } = null!;
 

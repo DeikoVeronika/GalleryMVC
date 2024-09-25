@@ -10,12 +10,13 @@ public partial class Author : Entity
     [Display(Name = "Ім'я фотографа")]
     public string Name { get; set; } = null!;
 
-    [Display(Name = "Країна автора")]
+    [Display(Name = "Країна фотографа")]
     public int? CountryId { get; set; }
 
-    [Display(Name = "Біографія автора")]
+    [Display(Name = "Біографія фотографа")]
     public string? Biography { get; set; }
 
+    [Display(Name = "Країна")]
     public virtual Country? Country { get; set; }
 
     public virtual ICollection<Photo> Photos { get; set; } = new List<Photo>();

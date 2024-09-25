@@ -3,27 +3,29 @@
 @model IEnumerable<GalleryDomain.Model.Author>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Фотографи";
 }
 
-<h1>Index</h1>
+<div class="d-flex align-items-center flex-column">
+    <h1>Фотографи</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<div class="list-group">
+    <p>
+        <a asp-action="Create">Додати фотографа</a>
+    </p>
+</div>
+<div class="list-group list-group-author">
     @foreach (var item in Model)
     {
-        <div class="list-group-item author_card_wrapper">
+        <div class="list-group-item list-group-item-author author_card_wrapper">
             <div class="d-flex author_card_title">
                 <div><h3>@Html.DisplayFor(modelItem => item.Name)</h3></div>
                 <div>@Html.DisplayFor(modelItem => item.Country.Name)</div>
             </div>
             <div><strong>@Html.DisplayNameFor(model => model.Biography):<br /></strong> @Html.DisplayFor(modelItem => item.Biography)</div>
             <div>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Edit</a>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Редагувати інформацію</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Інформація та роботи</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Видалити</a>
             </div>
         </div>
     }
