@@ -21,8 +21,8 @@ public partial class Photo : Entity
     [Display(Name = "Назва локації")]
     public int? LocationId { get; set; }
 
-    [Required(ErrorMessage = "Оберіть картинку")]
-    public byte[] Image { get; set; } = null!;
+    //[Required(ErrorMessage = "Оберіть картинку")]
+    public byte[]? Image { get; set; } = null!;
 
     public virtual Author? Author { get; set; }
 

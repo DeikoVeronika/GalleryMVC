@@ -41,7 +41,8 @@ namespace GalleryInfrastructure.Controllers
                 return NotFound();
             }
 
-            return View(country);
+            //return View(country);
+            return RedirectToAction("AuthorsByCountry", "Authors", new { id = country.Id, name = country.Name });
         }
 
         // GET: Countries/Create

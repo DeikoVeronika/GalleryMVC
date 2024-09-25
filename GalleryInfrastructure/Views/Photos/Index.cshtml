@@ -46,8 +46,12 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Image)
-            </td>
+                @if (item.Image != null)
+                    {
+                        var base64 = Convert.ToBase64String(item.Image);
+                        var imgSrc = $"data:image/jpeg;base64,{base64}";
+                        <img src="@imgSrc" alt="Image" style="max-width: 150px; max-height: 150px;" />
+                    }
             <td>
                 @Html.DisplayFor(modelItem => item.Author.Name)
             </td>

@@ -26,6 +26,17 @@ namespace GalleryInfrastructure.Controllers
             var galleryContext = _context.Authors.Include(a => a.Country);
             return View(await galleryContext.ToListAsync());
         }
+        public async Task<IActionResult> AuthorsByCountry(int? id, string? name)
+        {
+            if(id == null)
+                return RedirectToAction("Countries", "Index");
+
+            ViewBag.CountryId = id;
+            ViewBag.CountryName = name;
+
+            var authorsBycountry = _context.Authors.Where(a => a.CountryId == id).Include(a => a.Country);
+            return View(await authorsBycountry.ToListAsync());
+        }
 
         // GET: Authors/Details/5
         public async Task<IActionResult> Details(int? id)

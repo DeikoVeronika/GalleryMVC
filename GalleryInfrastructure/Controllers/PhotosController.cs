@@ -60,10 +60,22 @@ namespace GalleryInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AuthorId,Title,Date,Description,LocationId,Image,Id")] Photo photo)
+        public async Task<IActionResult> Create([Bind("AuthorId,Title,Date,Description,LocationId,Id")] Photo photo, IFormFile imageFile)
         {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                ModelState.AddModelError("Image", "Будь ласка, оберіть зображення.");
+            }
+
             if (ModelState.IsValid)
             {
+                using (var ms = new MemoryStream())
+                {
+                    await imageFile.CopyToAsync(ms);
+                    photo.Image = ms.ToArray(); // Конвертація файлу в масив байтів
+                }
+
+                // Перевірка на наявність фотографії
                 if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
                 {
                     _context.Add(photo);
@@ -71,13 +83,17 @@ namespace GalleryInfrastructure.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 else
-                    ModelState.AddModelError("Image", "Це зображення з такою назвою у цього автора вже існує");
-
+                {
+                    ModelState.AddModelError("Image", "У цього автора вже додано це зображення з ідентичним підписом. Будь ласка, оберіть інше зображення або придумаєте інший підпис.");
+                }
             }
+
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", photo.AuthorId);
             ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", photo.LocationId);
             return View(photo);
         }
+
+
 
         // GET: Photos/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -178,7 +194,7 @@ namespace GalleryInfrastructure.Controllers
         {
             return _context.Photos.Any(e => e.Id == id);
         }
-        private async Task<bool> IsPhotoExists(string title, byte[] image, int authorId, int id)
+        private async Task<bool> IsPhotoExists(string title, byte[]? image, int authorId, int id)
         {
             var photo = await _context.Photos
                 .FirstOrDefaultAsync(m => m.Title == title
