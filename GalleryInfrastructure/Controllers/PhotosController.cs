@@ -69,11 +69,7 @@ namespace GalleryInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                using (var ms = new MemoryStream())
-                {
-                    await imageFile.CopyToAsync(ms);
-                    photo.Image = ms.ToArray(); // Конвертація файлу в масив байтів
-                }
+                photo.Image = await ConvertImageToByteArrayAsync(imageFile);
 
                 // Перевірка на наявність фотографії
                 if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
@@ -118,42 +114,56 @@ namespace GalleryInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Title,Date,Description,LocationId,Image,Id")] Photo photo)
+        public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Title,Date,Description,LocationId,Image,Id")] Photo photo, IFormFile imageFile)
         {
             if (id != photo.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var existingPhoto = await _context.Photos.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+
+            if (existingPhoto == null)
+                return NotFound();
+
+
+            if (imageFile == null || imageFile.Length == 0)
+                photo.Image = existingPhoto.Image;
+
+
+            if (imageFile != null && imageFile.Length > 0)
+                photo.Image = await ConvertImageToByteArrayAsync(imageFile);
+
+
+            if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
             {
-                if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
+                try
                 {
-                    try
-                    {
-                        _context.Update(photo);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!PhotoExists(photo.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    return RedirectToAction(nameof(Index));
+                    _context.Update(photo);
+                    await _context.SaveChangesAsync();
                 }
-                else
-                    ModelState.AddModelError("Image", "Це зображення з такою назвою у цього автора вже існує");
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PhotoExists(photo.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
             }
+            else
+                ModelState.AddModelError("Image", "У цього автора вже додано це зображення з ідентичним підписом. Будь ласка, оберіть інше зображення або придумаєте інший підпис.");
+
+
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", photo.AuthorId);
             ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", photo.LocationId);
             return View(photo);
         }
+
 
         // GET: Photos/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -188,6 +198,14 @@ namespace GalleryInfrastructure.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+        private async Task<byte[]> ConvertImageToByteArrayAsync(IFormFile imageFile)
+        {
+            using (var ms = new MemoryStream())
+            {
+                await imageFile.CopyToAsync(ms);
+                return ms.ToArray();
+            }
         }
 
         private bool PhotoExists(int id)
