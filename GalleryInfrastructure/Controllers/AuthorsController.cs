@@ -48,6 +48,7 @@ namespace GalleryInfrastructure.Controllers
 
             var author = await _context.Authors
                 .Include(a => a.Country)
+                .Include(a => a.Photos)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (author == null)
             {
@@ -173,16 +174,12 @@ namespace GalleryInfrastructure.Controllers
             if (author == null)
                 return NotFound();
 
-            // Перевірка, чи є у автора прив'язані фото
             if (await IsAuthorLinkedToPhotos(id))
             {
-                // Якщо фото є, але немає підтвердження на видалення
                 if (!confirmDeletePhotos)
-                {
                     return Json(new { success = false, message = "До автора прив'язані фото. Підтвердіть видалення автора разом з фотографіями.", confirmRequired = true });
-                }
 
-                // Якщо підтвердження отримано, видаляємо фото разом з автором
+
                 _context.Photos.RemoveRange(_context.Photos.Where(p => p.AuthorId == id));
             }
 

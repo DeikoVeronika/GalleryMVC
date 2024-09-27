@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<GalleryDomain.Model.Photo>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Галерея";
 }
 
-<h1>Index</h1>
+<h1>Галерея</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Додати фото</a>
 </p>
 <table class="table">
     <thead>
@@ -59,9 +59,9 @@
                 @Html.DisplayFor(modelItem => item.Location.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Інформація</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Видалення</a>
             </td>
         </tr>
 }
@@ -69,14 +69,16 @@
 </table>
 
 
-<div class="row">
+<div class="img-row">
     @foreach (var item in Model)
     {
         @if (item.Image != null)
         {
             var base64 = Convert.ToBase64String(item.Image);
             var imgSrc = $"data:image/jpeg;base64,{base64}";
-            <img src="@imgSrc" alt="Image" />
+            <a asp-action="Details" asp-route-id="@item.Id">
+                <img src="@imgSrc" alt="Image" />
+            </a>
         }
     }
 </div>
@@ -88,7 +90,7 @@
         var msnry; 
 
         function initMasonry() {
-            var grid = document.querySelector('.row');
+            var grid = document.querySelector('.img-row');
             msnry = new Masonry(grid, {
                 itemSelector: 'img',
                 columnWidth: 'img',

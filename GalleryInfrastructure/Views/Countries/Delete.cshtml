@@ -1,14 +1,12 @@
 ﻿@model GalleryDomain.Model.Country
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Видалення";
 }
 
-<h1>Delete</h1>
 
-<h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>Country</h4>
+    <h4>Сторінка видалення</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -21,7 +19,7 @@
     
     <form id="deleteForm" asp-action="Delete" method="post" data-return-url="@Url.Action("Index")">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <input type="submit" value="Видалення" class="btn btn-danger" /> |
         <a asp-action="Index">Всі країни</a>
     </form>
 </div>

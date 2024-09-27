@@ -54,15 +54,17 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 200px;
 }
 
-.row {
+.img-row {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     padding: 10px 4px;
 }
 
-.row img {
-    margin-bottom: 15px;
+
+
+.img-row img {
+    padding: 15px;
     max-width: 33%;
     height: auto;
     object-fit: cover;

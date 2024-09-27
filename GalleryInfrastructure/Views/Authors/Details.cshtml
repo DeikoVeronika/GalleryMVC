@@ -33,3 +33,40 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати інформацію</a> |
     <a asp-action="Index">Всі фотографи</a>
 </div>
+
+
+
+<div class="img-row">
+    @foreach (var item in Model.Photos)
+    {
+        @if (item.Image != null)
+        {
+            var base64 = Convert.ToBase64String(item.Image);
+            var imgSrc = $"data:image/jpeg;base64,{base64}";
+            <a asp-action="Details" asp-route-id="@item.Id">
+                <img src="@imgSrc" alt="Image" />
+            </a>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+
+    <script>
+        var msnry;
+
+        function initMasonry() {
+            var grid = document.querySelector('.img-row');
+            msnry = new Masonry(grid, {
+                itemSelector: 'img',
+                columnWidth: 'img',
+                percentPosition: true
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            initMasonry();
+        });
+    </script>
+}

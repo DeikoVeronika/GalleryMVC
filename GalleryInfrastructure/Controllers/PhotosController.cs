@@ -71,7 +71,6 @@ namespace GalleryInfrastructure.Controllers
             {
                 photo.Image = await ConvertImageToByteArrayAsync(imageFile);
 
-                // Перевірка на наявність фотографії
                 if (!await IsPhotoExists(photo.Title, photo.Image, photo.AuthorId, photo.Id))
                 {
                     _context.Add(photo);
@@ -79,9 +78,8 @@ namespace GalleryInfrastructure.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 else
-                {
                     ModelState.AddModelError("Image", "У цього автора вже додано це зображення з ідентичним підписом. Будь ласка, оберіть інше зображення або придумаєте інший підпис.");
-                }
+
             }
 
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", photo.AuthorId);
@@ -95,15 +93,13 @@ namespace GalleryInfrastructure.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
 
             var photo = await _context.Photos.FindAsync(id);
             if (photo == null)
-            {
                 return NotFound();
-            }
+
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", photo.AuthorId);
             ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "Name", photo.LocationId);
             return View(photo);
@@ -117,9 +113,8 @@ namespace GalleryInfrastructure.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("AuthorId,Title,Date,Description,LocationId,Image,Id")] Photo photo, IFormFile imageFile)
         {
             if (id != photo.Id)
-            {
                 return NotFound();
-            }
+
 
             var existingPhoto = await _context.Photos.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
 

@@ -6,6 +6,7 @@ namespace GalleryDomain.Model;
 
 public partial class Photo : Entity
 {
+    [Display(Name = "Автор")]
     public int AuthorId { get; set; }
 
     [Required(ErrorMessage = "Придумайте назву для фото")]
@@ -22,9 +23,12 @@ public partial class Photo : Entity
     public int? LocationId { get; set; }
 
     //[Required(ErrorMessage = "Оберіть картинку")]
+    [Display(Name = "Фото")]
     public byte[]? Image { get; set; } = null!;
 
+    [Display(Name = "Автор")]
     public virtual Author? Author { get; set; }
 
+    [Display(Name = "Локація")]
     public virtual Location? Location { get; set; }
 }
