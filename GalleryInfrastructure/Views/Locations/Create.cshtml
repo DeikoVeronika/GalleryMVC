@@ -1,11 +1,10 @@
 ﻿@model GalleryDomain.Model.Location
 
 @{
-    ViewData["Title"] = "Створення";
+    ViewData["Title"] = "Створення локації";
 }
 
-
-<h4>Створення</h4>
+<h4>Створення локації</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -22,6 +21,16 @@
                 <span asp-validation-for="Link" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Latitude" class="control-label"></label>
+                <input asp-for="Latitude" class="form-control" type="number" step="any" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Longitude" class="control-label"></label>
+                <input asp-for="Longitude" class="form-control" type="number" step="any" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Додати" class="btn btn-primary" />
             </div>
         </form>
@@ -33,7 +42,8 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="~/js/site.js"></script>
-
 }

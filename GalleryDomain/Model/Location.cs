@@ -12,6 +12,8 @@ public partial class Location : Entity
 
     [Display(Name = "Посилання на локацію")]
     public string? Link { get; set; }
+    public double Latitude { get; set; } // Широта
+    public double Longitude { get; set; } // Довгота
 
     public virtual ICollection<Photo> Photos { get; set; } = new List<Photo>();
 }

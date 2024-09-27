@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Локації";
 }
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <h1>Локації</h1>
 
@@ -23,3 +24,40 @@
     }
 </div>
 
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    // Збираємо дані локацій з моделі
+    const locations = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+
+    const map = L.map('map').setView([51.5, -0.09], 2); // Центр карти (змініть координати на потрібні)
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Функція для відображення маркерів на карті
+    function displayMarkers() {
+        // Видалити існуючі маркери
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+
+        locations.forEach(location => {
+            addMarker(location);
+        });
+    }
+
+    // Додати маркер на карту
+    function addMarker(location) {
+        const marker = L.marker([location.Latitude, location.Longitude]).addTo(map)
+            .bindPopup(`<strong>${location.Name}</strong><br><a href="${location.Link}" target="_blank">Перейти до локації</a>`);
+    }
+
+    // Відображення всіх маркерів спочатку
+    displayMarkers();
+</script>

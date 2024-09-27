@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using GalleryDomain.Model;
 using GalleryInfrastructure;
 using System.Diagnostics.Metrics;
+using Newtonsoft.Json;
 
 namespace GalleryInfrastructure.Controllers
 {
@@ -23,7 +24,8 @@ namespace GalleryInfrastructure.Controllers
         // GET: Locations
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Locations.ToListAsync());
+            var locations = await _context.Locations.ToListAsync();
+            return View(locations);
         }
 
         // GET: Locations/Details/5
@@ -34,8 +36,7 @@ namespace GalleryInfrastructure.Controllers
                 return NotFound();
             }
 
-            var location = await _context.Locations
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var location = await _context.Locations.FirstOrDefaultAsync(m => m.Id == id);
             if (location == null)
             {
                 return NotFound();
@@ -51,11 +52,9 @@ namespace GalleryInfrastructure.Controllers
         }
 
         // POST: Locations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Link,Id")] Location location)
+        public async Task<IActionResult> Create([Bind("Name,Link,Latitude,Longitude")] Location location)
         {
             if (ModelState.IsValid)
             {
@@ -67,7 +66,6 @@ namespace GalleryInfrastructure.Controllers
                 }
                 else
                     ModelState.AddModelError("Name", "Локацію з такою назвою вже створено.");
-
             }
             return View(location);
         }
@@ -89,11 +87,9 @@ namespace GalleryInfrastructure.Controllers
         }
 
         // POST: Locations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,Link,Id")] Location location)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Link,Latitude,Longitude")] Location location)
         {
             if (id != location.Id)
             {
@@ -102,29 +98,23 @@ namespace GalleryInfrastructure.Controllers
 
             if (ModelState.IsValid)
             {
-                if (!await IsLocationExists(location.Name, location.Id))
+                try
                 {
-                    try
-                    {
-                        _context.Update(location);
-                        await _context.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!LocationExists(location.Id))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                    return RedirectToAction(nameof(Index));
+                    _context.Update(location);
+                    await _context.SaveChangesAsync();
                 }
-                else
-                    ModelState.AddModelError("Name", "Локацію з такою назвою вже створено.");
-
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!LocationExists(location.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
             }
             return View(location);
         }
@@ -137,8 +127,7 @@ namespace GalleryInfrastructure.Controllers
                 return NotFound();
             }
 
-            var location = await _context.Locations
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var location = await _context.Locations.FirstOrDefaultAsync(m => m.Id == id);
             if (location == null)
             {
                 return NotFound();
@@ -159,7 +148,6 @@ namespace GalleryInfrastructure.Controllers
             if (await IsLocationLinkedToPhotos(id))
                 return Json(new { success = false, message = "Неможливо видалити локацію, оскільки до неї прив'язані фото." });
 
-
             _context.Locations.Remove(location);
             await _context.SaveChangesAsync();
             return Json(new { success = true, message = "Локацію успішно видалено." });
@@ -174,13 +162,10 @@ namespace GalleryInfrastructure.Controllers
         {
             return _context.Locations.Any(e => e.Id == id);
         }
+
         private async Task<bool> IsLocationExists(string name, int id)
         {
-            var location = await _context.Locations
-                .FirstOrDefaultAsync(m => m.Name == name
-                                       && m.Id != id);
-
-            return location != null;
+            return await _context.Locations.AnyAsync(m => m.Name == name && m.Id != id);
         }
     }
 }
