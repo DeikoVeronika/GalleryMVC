@@ -6,11 +6,12 @@
     ViewData["Title"] = "Країни";
 }
 
-<h1>Країни</h1>
-
-<p>
-    <a asp-action="Create">Додати країну</a>
-</p>
+<div class="d-flex justify-content-between ">
+    <h1>Країни</h1>
+    <p>
+        <a asp-action="Create" class="btn btn-light">Додати країну</a>
+    </p>
+</div>
 <div class="list-group">
     @foreach (var item in Model)
     {
