@@ -38,54 +38,54 @@
     const map = L.map('map').setView([50.4501, 30.5234], 12); // Центр карти - Київ
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     // Функція для відображення маркерів на карті
     function displayMarkers() {
-        // Видалити існуючі маркери
-        map.eachLayer(layer => {
-            if (layer instanceof L.Marker) {
-                map.removeLayer(layer);
-            }
-        });
+    // Видалити існуючі маркери
+    map.eachLayer(layer => {
+    if (layer instanceof L.Marker) {
+    map.removeLayer(layer);
+    }
+    });
 
-        locations.forEach(location => {
-            addMarker(location);
-        });
+    locations.forEach(location => {
+    addMarker(location);
+    });
     }
 
     // Додати маркер на карту
     function addMarker(location) {
-        let popupContent = `<strong>${location.Name}</strong>`;
+    let popupContent = `<strong>${location.Name}</strong>`;
 
-        if (location.Link) {
-            popupContent += `<br><a href="${location.Link}" target="_blank">Перейти до локації</a>`;
-        }
+    if (location.Link) {
+    popupContent += `<br><a href="${location.Link}" target="_blank">Перейти до локації</a>`;
+    }
 
-        const marker = L.marker([location.Latitude, location.Longitude]).addTo(map)
-            .bindPopup(popupContent)
-            .bindTooltip(location.Name, { direction: 'top' }) 
-            .on('click', function () {
-                map.setView([location.Latitude, location.Longitude], 11); 
-            });
+    const marker = L.marker([location.Latitude, location.Longitude]).addTo(map)
+    .bindPopup(popupContent)
+    .bindTooltip(location.Name, { direction: 'top' })
+    .on('click', function () {
+    map.setView([location.Latitude, location.Longitude], 11);
+    });
 
-        // При відкритті попапа ховаємо тултіп
-        marker.on('popupopen', function (e) {
-            marker.unbindTooltip();
-        });
+    // При відкритті попапа ховаємо тултіп
+    marker.on('popupopen', function (e) {
+    marker.unbindTooltip();
+    });
 
-        // При закритті попапа знову додаємо тултіп
-        marker.on('popupclose', function (e) {
-            marker.bindTooltip(location.Name, { direction: 'top' }); 
-        });
+    // При закритті попапа знову додаємо тултіп
+    marker.on('popupclose', function (e) {
+    marker.bindTooltip(location.Name, { direction: 'top' });
+    });
     }
 
     displayMarkers();
 
     // Функція для переміщення до локації на карті
     function moveToLocation(lat, lng) {
-        map.setView([lat, lng], 15); 
+    map.setView([lat, lng], 15);
     }
 </script>
