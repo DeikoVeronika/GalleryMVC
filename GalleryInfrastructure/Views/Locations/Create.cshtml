@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Створення локації";
 }
+<div class="margin_top_50"></div>
 
 <h4>Створення локації</h4>
 <hr />
@@ -30,15 +31,13 @@
                 <input asp-for="Longitude" class="form-control" type="number" step="any" />
                 <span asp-validation-for="Longitude" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group d-flex " style="margin-top: 5px; gap: 10px;">
                 <input type="submit" value="Додати" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-light">Всі локації</a>
+
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Всі локації</a>
 </div>
 
 @section Scripts {

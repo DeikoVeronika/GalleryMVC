@@ -4,6 +4,9 @@
     ViewData["Title"] = "Галерея";
 }
 
+<div class="margin_top_50"></div>
+
+
 <div class="d-flex justify-content-between ">
     <h1>Галерея</h1>
     <p>
@@ -12,7 +15,7 @@
 </div>
 
 <!-- Image Grid -->
-<div class="img-row">
+<div class="img-row ">
     @foreach (var item in Model)
     {
         @if (item.Image != null)
@@ -33,16 +36,17 @@
 </div>
 
 <!-- Lightbox Modal -->
-<div id="lightbox" class="lightbox" style="display: none;">
+<div id="lightbox" class="lightbox margin_top_50" style="display: none;">
     <span class="close" onclick="closeLightbox()">&times;</span>
     <img class="lightbox-img" id="lightbox-img" src="" alt="Enlarged Image" />
     <div class="lightbox-info" id="lightbox-info"></div>
-    <button class="prev" onclick="changeImage(-1)">&#10094;</button>
-    <button class="next" onclick="changeImage(1)">&#10095;</button>
     <div class="lightbox-actions">
         <a id="edit-link" href="#" class="edit-btn btn btn-primary btn-sm">Редагувати</a>
         <a id="delete-link" href="#" class="delete-btn btn btn-danger btn-sm">Видалити</a>
     </div>
+    <button class="prev" onclick="changeImage(-1)">&#10094;</button>
+    <button class="next" onclick="changeImage(1)">&#10095;</button>
+
 </div>
 
 @section Scripts {

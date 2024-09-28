@@ -23,8 +23,16 @@ body {
 h1, h2, h3, h4, h5, h6 {
     margin: 0;
 }
-/*start author block*/
-.list-group-author {
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.margin_top_50 {
+    margin-top: 50px;
+}
+    /*start author block*/
+    .list-group-author {
     gap: 1rem;
     display: flex;
     flex-direction: row;
@@ -90,6 +98,10 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     flex-direction: column;
     color: white;
+}
+
+.lightbox-actions {
+    margin-bottom: 50px;
 }
 
 .lightbox-img {
