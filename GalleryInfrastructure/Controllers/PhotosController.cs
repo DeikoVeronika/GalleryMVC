@@ -204,6 +204,23 @@ namespace GalleryInfrastructure.Controllers
                 return ms.ToArray();
             }
         }
+        public ActionResult PhotoStatisticsByYear()
+        {
+            var photoStatistics = _context.Photos
+                .Where(p => p.Date.HasValue) 
+                .GroupBy(p => p.Date.Value.Year)
+                .Select(g => new
+                {
+                    Year = g.Key,
+                    PhotoCount = g.Count()
+                })
+                .OrderBy(x => x.Year)
+                .ToList();
+
+            ViewBag.PhotoStatisticsByYear = photoStatistics;
+
+            return View();
+        }
 
         private bool PhotoExists(int id)
         {

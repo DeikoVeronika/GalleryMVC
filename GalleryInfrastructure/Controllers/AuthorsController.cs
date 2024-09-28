@@ -21,11 +21,22 @@ namespace GalleryInfrastructure.Controllers
         }
 
         // GET: Authors
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var galleryContext = _context.Authors.Include(a => a.Country);
-            return View(await galleryContext.ToListAsync());
+            var authors = _context.Authors.Include(a => a.Photos).ToList();
+
+            var authorStatistics = authors.Select(a => new
+            {
+                AuthorName = a.Name,
+                PhotoCount = a.Photos.Count()
+            }).ToList();
+
+            ViewBag.AuthorStatistics = authorStatistics;
+
+            return View(authors);
         }
+
+
         public async Task<IActionResult> AuthorsByCountry(int? id, string? name)
         {
             if(id == null)

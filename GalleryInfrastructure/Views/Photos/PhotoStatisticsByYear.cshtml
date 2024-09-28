@@ -1,0 +1,67 @@
+﻿@model IEnumerable<GalleryDomain.Model.Photo>
+
+@{
+    ViewData["Title"] = "Статистика фото за роками";
+}
+
+<h2>Статистика фото за роками</h2>
+
+<!-- Полотно для відображення діаграми -->
+<canvas id="photoYearChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('photoYearChart').getContext('2d');
+
+    var yearLabels = @Html.Raw(Json.Serialize(((IEnumerable<dynamic>)ViewBag.PhotoStatisticsByYear).Select(p => p.Year)));
+    var photoCounts = @Html.Raw(Json.Serialize(((IEnumerable<dynamic>)ViewBag.PhotoStatisticsByYear).Select(p => p.PhotoCount)));
+
+    var photoYearData = {
+        labels: yearLabels, // Мітки осі X (роки)
+        datasets: [{
+            label: 'Кількість фото',
+            data: photoCounts, // Кількість фото на кожен рік
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.1 // Гладкість ліній
+        }]
+    };
+
+    var photoYearChart = new Chart(ctx, {
+        type: 'line',
+        data: photoYearData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Рік'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Кількість фото'
+                    },
+                    ticks: {
+                        // Додаємо крок, щоб відображати лише цілі числа
+                        stepSize: 1,
+                        callback: function (value) {
+                            return Number.isInteger(value) ? value : null;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
